@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import EditProfile from "./pages/EditProfile";
 
+// Create a client
 const queryClient = new QueryClient();
 
 const App = () => (
