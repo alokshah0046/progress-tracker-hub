@@ -1,13 +1,13 @@
 
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Logo from "@/components/Navbar";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "@/context/AuthContext";
 
 interface AuthFormProps {
   isSignUp?: boolean;
@@ -17,46 +17,51 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signUp, signIn, googleSignIn } = useAuth();
   const navigate = useNavigate();
 
-  // Since we don't have a real authentication system yet, 
-  // we'll simulate the login process
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Simulate loading
-    toast.loading(isSignUp ? "Creating your account..." : "Logging in...");
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast.dismiss();
-      
+    try {
       if (isSignUp) {
-        toast.success("Account created successfully!");
+        // Split name into first and last name
+        const nameParts = name.trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+        
+        await signUp(email, password, {
+          first_name: firstName,
+          last_name: lastName
+        });
+        
+        // In sign up, we don't navigate immediately since they need to verify their email
+        toast.info("Please check your email to verify your account");
       } else {
-        toast.success("Logged in successfully!");
+        await signIn(email, password);
+        // Navigation is handled in the signIn function
       }
-      
-      // Redirect to dashboard
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
-    }, 1500);
+    } catch (error) {
+      // Error toast is handled in the auth functions
+      console.error("Authentication error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
   
-  const handleGoogleSignIn = () => {
-    toast.loading("Connecting to Google...");
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast.dismiss();
-      toast.success("Logged in with Google!");
-      
-      // Redirect to dashboard
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
-    }, 1500);
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      await googleSignIn();
+      // Navigation happens via the OAuth redirect
+    } catch (error) {
+      // Error toast is handled in the auth function
+      console.error("Google authentication error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,6 +82,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
           variant="outline"
           className="w-full py-6 flex items-center justify-center gap-2 border border-border hover:bg-foreground/5"
           onClick={handleGoogleSignIn}
+          disabled={loading}
         >
           <FcGoogle className="h-5 w-5" />
           <span>{isSignUp ? "Sign up" : "Sign in"} with Google</span>
@@ -102,6 +108,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="portal-input"
+                disabled={loading}
               />
             </div>
           )}
@@ -116,6 +123,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="portal-input"
+              disabled={loading}
             />
           </div>
           
@@ -138,11 +146,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="portal-input"
+              disabled={loading}
             />
           </div>
           
-          <Button type="submit" className="w-full portal-btn-primary">
-            {isSignUp ? "Create account" : "Sign in"}
+          <Button 
+            type="submit" 
+            className="w-full portal-btn-primary"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : isSignUp ? "Create account" : "Sign in"}
           </Button>
         </form>
       </div>
@@ -161,7 +174,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
 };
 
 const Login = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const location = useLocation();
+  const isSignUp = location.pathname === "/signup";
   
   return (
     <div className="min-h-screen flex flex-col">

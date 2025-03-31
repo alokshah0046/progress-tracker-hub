@@ -4,7 +4,8 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { UserCircle } from "lucide-react";
+import { UserCircle, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface NavbarProps {
   transparent?: boolean;
@@ -13,9 +14,13 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ 
   transparent = false,
-  isAuthenticated = false
+  isAuthenticated: forcedAuth
 }) => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  
+  // Use prop if provided, otherwise determine from auth state
+  const isAuthenticated = forcedAuth !== undefined ? forcedAuth : !!user;
   
   return (
     <header
@@ -32,13 +37,18 @@ const Navbar: React.FC<NavbarProps> = ({
           <ThemeToggle />
           
           {isAuthenticated ? (
-            <Link to="/profile">
-              <Button variant="outline" className="gap-2">
-                <UserCircle className="h-4 w-4" />
-                Profile
+            <div className="flex items-center gap-2">
+              <Link to="/edit-profile">
+                <Button variant="outline" className="gap-2">
+                  <UserCircle className="h-4 w-4" />
+                  Profile
+                </Button>
+              </Link>
+              <Button variant="ghost" size="icon" onClick={() => signOut()}>
+                <LogOut className="h-4 w-4" />
               </Button>
-            </Link>
-          ) : location.pathname !== "/login" ? (
+            </div>
+          ) : location.pathname !== "/login" && location.pathname !== "/signup" ? (
             <Link to="/login">
               <Button className="portal-btn-primary">Login</Button>
             </Link>

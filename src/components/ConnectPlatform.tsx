@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Github,
   Code2,
@@ -10,81 +10,174 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { getUserStats, createStats, CodingStats } from "@/services/codingStatsService";
 
 interface PlatformProps {
   name: string;
   icon: React.ReactNode;
-  isConnected?: boolean;
+  isConnected: boolean;
   username?: string;
+  id?: string;
 }
 
 const ConnectPlatform: React.FC = () => {
-  const [platforms, setPlatforms] = useState<PlatformProps[]>([
+  const { user } = useAuth();
+  const [platforms, setPlatforms] = useState<PlatformProps[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Define available platforms
+  const availablePlatforms = [
     {
       name: "LeetCode",
       icon: <Code2 className="h-5 w-5" />,
-      isConnected: true,
-      username: "coder123",
     },
     {
       name: "GeeksForGeeks",
       icon: <BrainCircuit className="h-5 w-5" />,
-      isConnected: false,
     },
     {
       name: "CodeChef",
       icon: <Brackets className="h-5 w-5" />,
-      isConnected: false,
     },
     {
       name: "HackerRank",
       icon: <Code2 className="h-5 w-5" />,
-      isConnected: false,
     },
     {
       name: "CodeForces",
       icon: <Code2 className="h-5 w-5" />,
-      isConnected: false,
     },
     {
       name: "GitHub",
       icon: <Github className="h-5 w-5" />,
-      isConnected: true,
-      username: "dev_ninja",
     },
-  ]);
+  ];
 
-  const handleConnect = (platformName: string) => {
+  useEffect(() => {
+    const loadPlatforms = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        // Get user's connected platforms from database
+        const userStats = await getUserStats(user.id);
+        
+        // Map user stats to platform objects
+        const connectedPlatforms = userStats.map(stat => ({
+          name: stat.platform,
+          id: stat.id,
+          isConnected: true,
+          username: `user_${Math.floor(Math.random() * 1000)}`, // In a real app, this would come from the stats
+        }));
+        
+        // Merge with available platforms
+        const allPlatforms = availablePlatforms.map(platform => {
+          const connected = connectedPlatforms.find(p => p.name === platform.name);
+          return connected ? connected : { ...platform, isConnected: false };
+        });
+        
+        setPlatforms(allPlatforms);
+      } catch (error) {
+        console.error("Error loading platforms:", error);
+        toast.error("Failed to load connected platforms");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPlatforms();
+  }, [user]);
+
+  const handleConnect = async (platformName: string) => {
+    if (!user) {
+      toast.error("You must be logged in to connect a platform");
+      return;
+    }
+    
     toast.loading(`Connecting to ${platformName}...`);
     
-    // Simulate API call
-    setTimeout(() => {
-      setPlatforms(platforms.map(platform => 
-        platform.name === platformName 
-          ? { ...platform, isConnected: true, username: "user_" + Math.floor(Math.random() * 1000) } 
-          : platform
-      ));
+    try {
+      // Create a new stats record for this platform
+      const newStats: CodingStats = {
+        user_id: user.id,
+        platform: platformName,
+        total_questions: 0,
+        easy_questions: 0,
+        medium_questions: 0,
+        hard_questions: 0,
+        active_days: 0
+      };
       
+      const createdStat = await createStats(newStats);
+      
+      if (createdStat) {
+        // Update local state
+        setPlatforms(platforms.map(platform => 
+          platform.name === platformName 
+            ? { 
+                ...platform, 
+                isConnected: true, 
+                id: createdStat.id,
+                username: `user_${Math.floor(Math.random() * 1000)}` 
+              } 
+            : platform
+        ));
+        
+        toast.dismiss();
+        toast.success(`Connected to ${platformName} successfully!`);
+      }
+    } catch (error) {
+      console.error("Error connecting platform:", error);
       toast.dismiss();
-      toast.success(`Connected to ${platformName} successfully!`);
-    }, 1500);
+      toast.error(`Failed to connect to ${platformName}`);
+    }
   };
 
-  const handleDisconnect = (platformName: string) => {
+  const handleDisconnect = async (platformName: string, statId?: string) => {
+    if (!user || !statId) {
+      toast.error("Cannot disconnect platform");
+      return;
+    }
+    
     toast.loading(`Disconnecting from ${platformName}...`);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Delete the stats record
+      const { error } = await supabase
+        .from("coding_stats")
+        .delete()
+        .eq("id", statId);
+      
+      if (error) throw error;
+      
+      // Update local state
       setPlatforms(platforms.map(platform => 
         platform.name === platformName 
-          ? { ...platform, isConnected: false, username: undefined } 
+          ? { ...platform, isConnected: false, username: undefined, id: undefined } 
           : platform
       ));
       
       toast.dismiss();
       toast.success(`Disconnected from ${platformName}`);
-    }, 1500);
+    } catch (error) {
+      console.error("Error disconnecting platform:", error);
+      toast.dismiss();
+      toast.error(`Failed to disconnect from ${platformName}`);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="glass-card rounded-xl p-6 min-h-[300px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p>Loading platforms...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass-card rounded-xl p-6">
@@ -113,7 +206,7 @@ const ConnectPlatform: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleDisconnect(platform.name)}
+                onClick={() => handleDisconnect(platform.name, platform.id)}
               >
                 <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                 Connected
