@@ -65,20 +65,31 @@ const ConnectPlatform: React.FC = () => {
         const userStats = await getUserStats(user.id);
         
         // Map user stats to platform objects
-        const connectedPlatforms = userStats.map(stat => ({
-          name: stat.platform,
-          id: stat.id,
-          isConnected: true,
-          username: `user_${Math.floor(Math.random() * 1000)}`, // In a real app, this would come from the stats
-        }));
+        const connectedPlatformsMap = new Map<string, PlatformProps>();
         
-        // Merge with available platforms
-        const allPlatforms = availablePlatforms.map(platform => {
-          const connected = connectedPlatforms.find(p => p.name === platform.name);
-          return connected ? connected : { ...platform, isConnected: false };
+        // First, populate the map with all available platforms (with their icons)
+        availablePlatforms.forEach(platform => {
+          connectedPlatformsMap.set(platform.name, {
+            ...platform,
+            isConnected: false
+          });
         });
         
-        setPlatforms(allPlatforms);
+        // Then update the connected ones
+        userStats.forEach(stat => {
+          const platform = connectedPlatformsMap.get(stat.platform);
+          if (platform) {
+            connectedPlatformsMap.set(stat.platform, {
+              ...platform,
+              id: stat.id,
+              isConnected: true,
+              username: `user_${Math.floor(Math.random() * 1000)}`, // In a real app, this would come from the stats
+            });
+          }
+        });
+        
+        // Convert map back to array
+        setPlatforms(Array.from(connectedPlatformsMap.values()));
       } catch (error) {
         console.error("Error loading platforms:", error);
         toast.error("Failed to load connected platforms");
