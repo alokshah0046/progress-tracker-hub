@@ -1,9 +1,8 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Logo from "@/components/Logo";
 import { Link } from "react-router-dom";
-import { ArrowRight, Code, GitBranch, BarChart3, Mail, Info, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, Code, GitBranch, BarChart3, Mail, Info, ExternalLink, ChevronDown, ChevronUp, Twitter, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -377,54 +376,85 @@ const Index = () => {
                 Stay updated with our latest features and updates.
               </p>
               <div className="flex space-x-4">
-                <a 
-                  href="https://x.com/AlokKum27449982" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  aria-label="Alok's Twitter"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                  </svg>
-                </a>
-                <a 
-                  href="https://x.com/jena_rahul95127" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  aria-label="Rahul's Twitter"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                  </svg>
-                </a>
-                <a 
-                  href="https://www.instagram.com/yayy._alokshah?igsh=dmtzZDdwOWN4cWhs" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  aria-label="Alok's Instagram"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                </a>
-                <a 
-                  href="https://www.instagram.com/rahul_jena711?igsh=b294b2RrMzNlNDhv" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  aria-label="Rahul's Instagram"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                </a>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-foreground transition-colors" aria-label="Twitter Profiles">
+                      <Twitter size={24} />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Our Twitter Profiles</DialogTitle>
+                      <DialogDescription>
+                        Follow us on Twitter for updates
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Twitter size={18} className="text-portal-blue" />
+                        <a 
+                          href="https://x.com/AlokKum27449982" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-portal-blue hover:underline"
+                        >
+                          Alok Kumar Shah
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Twitter size={18} className="text-portal-blue" />
+                        <a 
+                          href="https://x.com/jena_rahul95127" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-portal-blue hover:underline"
+                        >
+                          Rahul Jena
+                        </a>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-foreground transition-colors" aria-label="Instagram Profiles">
+                      <Instagram size={24} />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Our Instagram Profiles</DialogTitle>
+                      <DialogDescription>
+                        Follow us on Instagram
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Instagram size={18} className="text-portal-blue" />
+                        <a 
+                          href="https://www.instagram.com/yayy._alokshah?igsh=dmtzZDdwOWN4cWhs" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-portal-blue hover:underline"
+                        >
+                          Alok Kumar Shah
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Instagram size={18} className="text-portal-blue" />
+                        <a 
+                          href="https://www.instagram.com/rahul_jena711?igsh=b294b2RrMzNlNDhv" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-portal-blue hover:underline"
+                        >
+                          Rahul Jena
+                        </a>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
