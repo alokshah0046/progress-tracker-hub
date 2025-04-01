@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/context/AuthContext";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface AuthFormProps {
   isSignUp?: boolean;
@@ -16,6 +17,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, googleSignIn } = useAuth();
   const navigate = useNavigate();
@@ -33,7 +35,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
         
         await signUp(email, password, {
           first_name: firstName,
-          last_name: lastName
+          last_name: lastName,
+          role: role
         });
         
         // In sign up, we don't navigate immediately since they need to verify their email
@@ -98,18 +101,39 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="portal-input"
-                disabled={loading}
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="portal-input"
+                  disabled={loading}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Account Type</Label>
+                <RadioGroup 
+                  defaultValue="user" 
+                  value={role} 
+                  onValueChange={setRole} 
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="user" id="user" />
+                    <Label htmlFor="user" className="cursor-pointer">User</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="admin" id="admin" />
+                    <Label htmlFor="admin" className="cursor-pointer">Admin</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </>
           )}
           
           <div className="space-y-2">
@@ -148,6 +172,27 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
               disabled={loading}
             />
           </div>
+          
+          {!isSignUp && (
+            <div className="space-y-2">
+              <Label>Sign in as</Label>
+              <RadioGroup 
+                defaultValue="user" 
+                value={role} 
+                onValueChange={setRole} 
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="user" id="user-login" />
+                  <Label htmlFor="user-login" className="cursor-pointer">User</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="admin" id="admin-login" />
+                  <Label htmlFor="admin-login" className="cursor-pointer">Admin</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
           
           <Button 
             type="submit" 

@@ -1,5 +1,6 @@
 
 import React from "react";
+import Logo from "@/components/Logo";
 
 const AuthIllustration: React.FC = () => {
   return (
@@ -10,6 +11,13 @@ const AuthIllustration: React.FC = () => {
       </div>
       
       <div className="relative glass-card p-8 rounded-2xl w-full max-w-md">
+        <div className="flex flex-col items-center mb-8">
+          <Logo size="lg" withText={true} />
+          <p className="mt-4 text-xl text-center font-medium text-foreground/80">
+            Track. Improve. Succeed.
+          </p>
+        </div>
+        
         <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gradient-to-br from-portal-blue/20 to-portal-purple/20 backdrop-blur-sm p-8 flex items-center justify-center">
           <img 
             src="/lovable-uploads/fa05a9aa-e88c-42e4-8f14-0f88c27e60d4.png" 
