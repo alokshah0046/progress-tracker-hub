@@ -31,8 +31,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (location.hash && location.hash.includes('access_token')) {
         try {
           setLoading(true);
-          // Use the correct method to get session from URL
-          const { data, error } = await supabase.auth.getSession();
+          // Process the URL with hash parameters
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            window.location.href
+          );
           
           if (error) {
             throw error;
@@ -127,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/dashboard',
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
