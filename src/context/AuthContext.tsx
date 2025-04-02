@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,8 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (location.hash && location.hash.includes('access_token')) {
         try {
           setLoading(true);
-          // Let Supabase handle the OAuth response
-          const { data, error } = await supabase.auth.getSessionFromUrl();
+          // Use the correct method to get session from URL
+          const { data, error } = await supabase.auth.getSession();
           
           if (error) {
             throw error;
