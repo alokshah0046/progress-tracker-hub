@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -58,10 +57,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignUp = false }) => {
       setLoading(true);
       await googleSignIn();
       // Navigation happens via the OAuth redirect
+      toast.info("Redirecting to Google for authentication...");
     } catch (error) {
       // Error toast is handled in the auth function
       console.error("Google authentication error:", error);
-    } finally {
       setLoading(false);
     }
   };
