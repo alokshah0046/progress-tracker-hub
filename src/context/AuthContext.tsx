@@ -1,8 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 interface AuthContextProps {
@@ -22,8 +21,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
+    // Handle OAuth redirects
+    const handleOAuthRedirect = async () => {
+      // Check if we have a hash in the URL (which happens with OAuth redirects)
+      if (location.hash && location.hash.includes('access_token')) {
+        try {
+          setLoading(true);
+          // Let Supabase handle the OAuth response
+          const { data, error } = await supabase.auth.getSessionFromUrl();
+          
+          if (error) {
+            throw error;
+          }
+          
+          if (data?.session) {
+            setSession(data.session);
+            setUser(data.session.user);
+            toast.success("Logged in successfully!");
+            navigate("/dashboard", { replace: true });
+          }
+        } catch (error: any) {
+          toast.error(error.message || "Error processing authentication");
+          console.error("OAuth redirect error:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    handleOAuthRedirect();
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -45,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [location, navigate]);
 
   const signUp = async (email: string, password: string, metadata?: any) => {
     try {
