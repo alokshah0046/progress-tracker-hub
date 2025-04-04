@@ -9,10 +9,12 @@ interface AuthContextProps {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  userRole: string;
   signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   googleSignIn: () => Promise<void>;
+  checkUserRole: () => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -21,8 +23,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>("user"); // Default role is user
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Function to check user role
+  const checkUserRole = async (): Promise<string> => {
+    if (!user) return "user";
+    
+    try {
+      // Here we would typically check against a roles table in the database
+      // For now, we'll use a simplified approach using user metadata
+      // In a real application, you'd query your user_roles table
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      
+      const role = data?.role || "user";
+      setUserRole(role);
+      return role;
+    } catch (error) {
+      console.error("Error checking user role:", error);
+      return "user"; // Default to user role on error
+    }
+  };
 
   useEffect(() => {
     // Handle OAuth redirects
@@ -43,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (data?.session) {
             setSession(data.session);
             setUser(data.session.user);
+            await checkUserRole(); // Check the user's role
             toast.success("Logged in successfully!");
             navigate("/dashboard", { replace: true });
           }
@@ -59,21 +88,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           setSession(session);
           setUser(session?.user ?? null);
+          if (session?.user) {
+            // Use setTimeout to prevent potential auth deadlocks
+            setTimeout(() => {
+              checkUserRole();
+            }, 0);
+          }
         } else if (event === "SIGNED_OUT") {
           setSession(null);
           setUser(null);
+          setUserRole("user");
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        await checkUserRole();
+      }
       setLoading(false);
     });
 
@@ -150,10 +189,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         session,
         user,
         loading,
+        userRole,
         signUp,
         signIn,
         signOut,
         googleSignIn,
+        checkUserRole,
       }}
     >
       {children}
