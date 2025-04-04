@@ -32,18 +32,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return "user";
     
     try {
-      // Here we would typically check against a roles table in the database
-      // For now, we'll use a simplified approach using user metadata
-      // In a real application, you'd query your user_roles table
-      const { data, error } = await supabase
-        .from("profiles")
+      // Check if user has an admin role in user_roles table
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
         .select("role")
-        .eq("id", user.id)
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
       
-      if (error) throw error;
+      if (roleError) {
+        console.error("Error checking user role:", roleError);
+        return "user"; // Default to user role on error
+      }
       
-      const role = data?.role || "user";
+      const role = roleData?.role || "user";
       setUserRole(role);
       return role;
     } catch (error) {

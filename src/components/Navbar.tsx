@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
@@ -17,10 +17,32 @@ const Navbar: React.FC<NavbarProps> = ({
   isAuthenticated: forcedAuth
 }) => {
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const [authState, setAuthState] = useState<{user: any; signOut: () => Promise<void>} | null>(null);
   
+  // Try to use auth context but don't fail if not available
+  useEffect(() => {
+    try {
+      // Only import and use auth when component is mounted
+      import('@/context/AuthContext').then(module => {
+        const { useAuth } = module;
+        try {
+          // Get auth context from the custom hook
+          const authContext = useAuth();
+          setAuthState({
+            user: authContext.user,
+            signOut: authContext.signOut
+          });
+        } catch (error) {
+          console.log("Auth context not available, using props instead");
+        }
+      });
+    } catch (error) {
+      console.log("Failed to load auth context");
+    }
+  }, []);
+
   // Use prop if provided, otherwise determine from auth state
-  const isAuthenticated = forcedAuth !== undefined ? forcedAuth : !!user;
+  const isAuthenticated = forcedAuth !== undefined ? forcedAuth : !!authState?.user;
   
   return (
     <header
@@ -44,7 +66,11 @@ const Navbar: React.FC<NavbarProps> = ({
                   Profile
                 </Button>
               </Link>
-              <Button variant="ghost" size="icon" onClick={() => signOut()}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => authState?.signOut && authState.signOut()}
+              >
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
