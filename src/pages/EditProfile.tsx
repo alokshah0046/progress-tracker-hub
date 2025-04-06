@@ -19,6 +19,18 @@ const EditProfile = () => {
     user
   } = useProfileData();
 
+  // Handle dropdown select fields
+  const handleSelectChange = (field: string, value: string) => {
+    const syntheticEvent = {
+      target: {
+        name: field,
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(syntheticEvent);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar isAuthenticated={!!user} />
@@ -43,6 +55,7 @@ const EditProfile = () => {
             userId={user?.id || ""}
             handleChange={handleChange}
             handleSubmit={handleSubmit}
+            handleSelectChange={handleSelectChange}
             updateProfilePhoto={updateProfilePhoto}
             getInitials={getInitials}
           />

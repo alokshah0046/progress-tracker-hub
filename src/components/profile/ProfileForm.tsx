@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Save, User, MapPin, Mail, School } from "lucide-react";
+import { Save, User, MapPin, Mail, School, Smartphone, Briefcase, Code, Globe } from "lucide-react";
 import ProfilePhotoUploader from "./ProfilePhotoUploader";
 import { ProfileData } from "@/services/profileService";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProfileFormProps {
   profile: ProfileData;
@@ -15,6 +16,7 @@ interface ProfileFormProps {
   userId: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
+  handleSelectChange?: (field: string, value: string) => void;
   updateProfilePhoto: (photoUrl: string) => void;
   getInitials: () => string;
 }
@@ -25,6 +27,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   userId,
   handleChange,
   handleSubmit,
+  handleSelectChange = () => {},
   updateProfilePhoto,
   getInitials,
 }) => {
@@ -70,6 +73,40 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               />
             </div>
           </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender</Label>
+              <Select 
+                onValueChange={(value) => handleSelectChange('gender', value)} 
+                defaultValue={profile.gender || ""}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="gender" className="portal-input">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="age">Age</Label>
+              <Input
+                id="age"
+                name="age"
+                type="number"
+                value={profile.age || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
         </div>
         
         <Separator />
@@ -97,6 +134,19 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             </div>
             
             <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={profile.phone || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="country" className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
                 Country
@@ -105,6 +155,53 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                 id="country"
                 name="country"
                 value={profile.country || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <Separator />
+        
+        {/* Social Media */}
+        <div>
+          <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Social Media
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn URL</Label>
+              <Input
+                id="linkedin"
+                name="linkedin"
+                value={profile.linkedin || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="github">GitHub URL</Label>
+              <Input
+                id="github"
+                name="github"
+                value={profile.github || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="twitter">Twitter/X URL</Label>
+              <Input
+                id="twitter"
+                name="twitter"
+                value={profile.twitter || ""}
                 onChange={handleChange}
                 className="portal-input"
                 disabled={isLoading}
@@ -131,6 +228,55 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                 onChange={handleChange}
                 className="portal-input"
                 disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="school">School Name</Label>
+              <Input
+                id="school"
+                name="school"
+                value={profile.school || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <Separator />
+        
+        {/* Skills & Languages */}
+        <div>
+          <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+            <Code className="h-5 w-5" />
+            Skills & Languages
+          </h2>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="skills">Skills (comma-separated)</Label>
+              <Input
+                id="skills"
+                name="skills"
+                value={profile.skills || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+                placeholder="React, TypeScript, Node.js, etc."
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="languages">Programming Languages (comma-separated)</Label>
+              <Input
+                id="languages"
+                name="languages"
+                value={profile.languages || ""}
+                onChange={handleChange}
+                className="portal-input"
+                disabled={isLoading}
+                placeholder="JavaScript, Python, Java, etc."
               />
             </div>
           </div>

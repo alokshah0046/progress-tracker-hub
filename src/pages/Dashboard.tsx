@@ -107,6 +107,54 @@ const generateMockData = () => {
       hard: 2,
       platforms: ["LeetCode", "GeeksForGeeks"],
     },
+    {
+      category: "Hash Table",
+      total: 14,
+      easy: 7,
+      medium: 5,
+      hard: 2,
+      platforms: ["LeetCode", "HackerRank"],
+    },
+    {
+      category: "Searching & Sorting",
+      total: 16,
+      easy: 8,
+      medium: 6,
+      hard: 2,
+      platforms: ["CodeChef", "GeeksForGeeks"],
+    },
+    {
+      category: "Database",
+      total: 9,
+      easy: 5,
+      medium: 3,
+      hard: 1,
+      platforms: ["LeetCode", "HackerRank"],
+    },
+    {
+      category: "Pattern-based",
+      total: 11,
+      easy: 6,
+      medium: 4,
+      hard: 1,
+      platforms: ["GeeksForGeeks", "CodeChef"],
+    },
+    {
+      category: "String Manipulation",
+      total: 15,
+      easy: 8,
+      medium: 5,
+      hard: 2,
+      platforms: ["LeetCode", "CodeForces"],
+    },
+    {
+      category: "Development",
+      total: 6,
+      easy: 3,
+      medium: 2,
+      hard: 1,
+      platforms: ["HackerRank", "CodeChef"],
+    },
   ];
 
   // Mock leaderboard data
@@ -127,6 +175,24 @@ const generateMockData = () => {
     { id: "5", rank: 5, name: "Tina Chen", score: 85, platform: "LeetCode" },
   ];
 
+  // Category leaderboard
+  const categoryLeaderboard = [
+    { id: "1", rank: 1, name: "John Doe", score: 87, category: "Arrays & Strings" },
+    { id: "2", rank: 2, name: "Emma Roberts", score: 79, category: "Arrays & Strings" },
+    { id: "3", rank: 3, name: "Michael Brown", score: 72, category: "Arrays & Strings" },
+    { id: "4", rank: 4, name: "Sarah Wong", score: 68, category: "Arrays & Strings" },
+    { id: "5", rank: 5, name: "David Lee", score: 65, category: "Arrays & Strings" },
+  ];
+
+  // Difficulty leaderboard
+  const difficultyLeaderboard = [
+    { id: "1", rank: 1, name: "John Doe", easy: 120, medium: 85, hard: 45 },
+    { id: "2", rank: 2, name: "Sarah Lee", easy: 110, medium: 90, hard: 38 },
+    { id: "3", rank: 3, name: "Alex Johnson", easy: 115, medium: 75, hard: 42 },
+    { id: "4", rank: 4, name: "Mark Davis", easy: 105, medium: 82, hard: 36 },
+    { id: "5", rank: 5, name: "Tina Chen", easy: 95, medium: 85, hard: 40 },
+  ];
+
   return {
     pieChartData,
     platformData,
@@ -137,6 +203,8 @@ const generateMockData = () => {
     streak: 12,
     leaderboardData,
     platformLeaderboard,
+    categoryLeaderboard,
+    difficultyLeaderboard
   };
 };
 
@@ -181,7 +249,7 @@ const Dashboard = () => {
       <main className="flex-1 pt-24 pb-12 px-4 md:px-6 max-w-7xl mx-auto w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-1">Progress Portal</h1>
             <p className="text-foreground/70">
               Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''}! Here's your coding journey.
             </p>
@@ -196,10 +264,11 @@ const Dashboard = () => {
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList>
+          <TabsList className="w-full md:w-auto flex justify-between md:justify-start">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+            <TabsTrigger value="platforms">Platforms</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-6">
@@ -278,25 +347,73 @@ const Dashboard = () => {
           </TabsContent>
           
           <TabsContent value="leaderboard" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <LeaderboardTable 
                 data={data.leaderboardData}
                 title="Overall Leaderboard"
                 category="Total Score"
               />
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <LeaderboardTable 
                 data={data.platformLeaderboard}
                 title="Platform Leaderboard"
                 category="LeetCode"
               />
+              <LeaderboardTable 
+                data={data.categoryLeaderboard}
+                title="Category Leaderboard"
+                category="Arrays & Strings"
+              />
+            </div>
+            
+            <div className="mt-6">
+              <div className="glass-card rounded-xl p-6">
+                <h3 className="text-lg font-medium mb-4">Difficulty Challenge</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="text-xs uppercase">
+                      <tr className="border-b border-border/40">
+                        <th className="py-3 px-4">Rank</th>
+                        <th className="py-3 px-4">Name</th>
+                        <th className="py-3 px-4">Easy</th>
+                        <th className="py-3 px-4">Medium</th>
+                        <th className="py-3 px-4">Hard</th>
+                        <th className="py-3 px-4">Total Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.difficultyLeaderboard.map((entry, index) => {
+                        // Calculate total points: easy=1pt, medium=2pts, hard=3pts
+                        const totalPoints = entry.easy * 1 + entry.medium * 2 + entry.hard * 3;
+                        
+                        return (
+                          <tr 
+                            key={entry.id} 
+                            className="border-b border-border/20 hover:bg-foreground/5"
+                          >
+                            <td className="py-2 px-4 font-medium">{entry.rank}</td>
+                            <td className="py-2 px-4">{entry.name}</td>
+                            <td className="py-2 px-4">{entry.easy}</td>
+                            <td className="py-2 px-4">{entry.medium}</td>
+                            <td className="py-2 px-4">{entry.hard}</td>
+                            <td className="py-2 px-4 font-bold">{totalPoints}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </TabsContent>
+          
+          <TabsContent value="platforms" className="space-y-6">
+            {/* Connect Platforms */}
+            <ConnectPlatform />
+          </TabsContent>
         </Tabs>
-        
-        {/* Connect Platforms */}
-        <div className="mt-6">
-          <ConnectPlatform />
-        </div>
       </main>
     </div>
   );

@@ -9,7 +9,16 @@ export interface ProfileData {
   email?: string;
   country?: string;
   college?: string;
+  school?: string;  // Added for school name
   profile_photo?: string;
+  gender?: string;  // Added for gender
+  age?: string;     // Added for age
+  phone?: string;   // Added for phone number
+  linkedin?: string; // Added for LinkedIn
+  github?: string;   // Added for GitHub
+  twitter?: string;  // Added for Twitter/X
+  skills?: string;   // Added for skills
+  languages?: string; // Added for programming languages
 }
 
 export const getProfile = async (userId: string) => {

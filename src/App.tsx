@@ -54,6 +54,16 @@ const App = () => (
               } 
             />
             
+            {/* Redirect based on role after login */}
+            <Route 
+              path="/redirect" 
+              element={
+                <ProtectedRoute>
+                  <RoleBasedRedirect />
+                </ProtectedRoute>
+              } 
+            />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -62,5 +72,14 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
+
+// Component to redirect based on user role
+const RoleBasedRedirect = () => {
+  const { userRole } = useAuth();
+  
+  return userRole === 'admin' 
+    ? <Navigate to="/admin" replace /> 
+    : <Navigate to="/dashboard" replace />;
+};
 
 export default App;
