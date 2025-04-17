@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import StatCard from "@/components/StatCard";
@@ -8,6 +7,7 @@ import LineChart from "@/components/charts/LineChart";
 import CategoryTable, { CategoryData } from "@/components/CategoryTable";
 import ConnectPlatform from "@/components/ConnectPlatform";
 import LeaderboardTable from "@/components/LeaderboardTable";
+import LeaderboardSection from "@/components/LeaderboardSection";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { 
@@ -347,66 +347,13 @@ const Dashboard = () => {
           </TabsContent>
           
           <TabsContent value="leaderboard" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <LeaderboardTable 
-                data={data.leaderboardData}
-                title="Overall Leaderboard"
-                category="Total Score"
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <LeaderboardTable 
-                data={data.platformLeaderboard}
-                title="Platform Leaderboard"
-                category="LeetCode"
-              />
-              <LeaderboardTable 
-                data={data.categoryLeaderboard}
-                title="Category Leaderboard"
-                category="Arrays & Strings"
-              />
-            </div>
-            
-            <div className="mt-6">
-              <div className="glass-card rounded-xl p-6">
-                <h3 className="text-lg font-medium mb-4">Difficulty Challenge</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead className="text-xs uppercase">
-                      <tr className="border-b border-border/40">
-                        <th className="py-3 px-4">Rank</th>
-                        <th className="py-3 px-4">Name</th>
-                        <th className="py-3 px-4">Easy</th>
-                        <th className="py-3 px-4">Medium</th>
-                        <th className="py-3 px-4">Hard</th>
-                        <th className="py-3 px-4">Total Points</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.difficultyLeaderboard.map((entry, index) => {
-                        // Calculate total points: easy=1pt, medium=2pts, hard=3pts
-                        const totalPoints = entry.easy * 1 + entry.medium * 2 + entry.hard * 3;
-                        
-                        return (
-                          <tr 
-                            key={entry.id} 
-                            className="border-b border-border/20 hover:bg-foreground/5"
-                          >
-                            <td className="py-2 px-4 font-medium">{entry.rank}</td>
-                            <td className="py-2 px-4">{entry.name}</td>
-                            <td className="py-2 px-4">{entry.easy}</td>
-                            <td className="py-2 px-4">{entry.medium}</td>
-                            <td className="py-2 px-4">{entry.hard}</td>
-                            <td className="py-2 px-4 font-bold">{totalPoints}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            {/* Using our custom LeaderboardSection component */}
+            <LeaderboardSection 
+              difficultyLeaderboard={data.difficultyLeaderboard}
+              platformLeaderboard={data.platformLeaderboard}
+              categoryLeaderboard={data.categoryLeaderboard}
+              leaderboardData={data.leaderboardData}
+            />
           </TabsContent>
           
           <TabsContent value="platforms" className="space-y-6">
