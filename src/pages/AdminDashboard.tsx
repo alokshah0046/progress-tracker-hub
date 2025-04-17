@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import LeaderboardSection from "@/components/LeaderboardSection";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -42,6 +42,39 @@ const AdminDashboard = () => {
     { id: "3", name: "Admin User", email: "admin@example.com", role: "admin", lastActive: "2023-04-03" },
     { id: "4", name: "Grace Wilson", email: "grace@example.com", role: "user", lastActive: "2023-04-01" },
     { id: "5", name: "Tom Richards", email: "tom@example.com", role: "user", lastActive: "2023-03-28" },
+  ];
+
+  // Mock data for leaderboards
+  const mockLeaderboardData = [
+    { id: "1", rank: 1, name: "John Doe", score: 1250, activeDays: 45, profilePic: "https://i.pravatar.cc/150?img=1" },
+    { id: "2", rank: 2, name: "Jane Smith", score: 980, activeDays: 38 },
+    { id: "3", rank: 3, name: "Grace Wilson", score: 830, activeDays: 30 },
+    { id: "4", rank: 4, name: "Tom Richards", score: 720, activeDays: 25 },
+    { id: "5", rank: 5, name: "Alex Johnson", score: 650, activeDays: 20 },
+  ];
+
+  const mockDifficultyLeaderboard = [
+    { id: "1", rank: 1, name: "John Doe", easy: 120, medium: 85, hard: 42 },
+    { id: "2", rank: 2, name: "Jane Smith", easy: 95, medium: 72, hard: 38 },
+    { id: "3", rank: 3, name: "Grace Wilson", easy: 110, medium: 60, hard: 25 },
+    { id: "4", rank: 4, name: "Tom Richards", easy: 85, medium: 45, hard: 30 },
+    { id: "5", rank: 5, name: "Alex Johnson", easy: 75, medium: 50, hard: 28 },
+  ];
+
+  const mockPlatformLeaderboard = [
+    { id: "1", rank: 1, name: "John Doe", score: 850, platform: "LeetCode" },
+    { id: "2", rank: 2, name: "Jane Smith", score: 780, platform: "HackerRank" },
+    { id: "3", rank: 3, name: "Grace Wilson", score: 720, platform: "CodeForces" },
+    { id: "4", rank: 4, name: "Tom Richards", score: 650, platform: "CodeChef" },
+    { id: "5", rank: 5, name: "Alex Johnson", score: 580, platform: "LeetCode" },
+  ];
+
+  const mockCategoryLeaderboard = [
+    { id: "1", rank: 1, name: "John Doe", score: 450, category: "Algorithms" },
+    { id: "2", rank: 2, name: "Jane Smith", score: 380, category: "Data Structures" },
+    { id: "3", rank: 3, name: "Grace Wilson", score: 320, category: "Dynamic Programming" },
+    { id: "4", rank: 4, name: "Tom Richards", score: 280, category: "Graph Theory" },
+    { id: "5", rank: 5, name: "Alex Johnson", score: 250, category: "String Manipulation" },
   ];
 
   // Mock handler functions
@@ -66,7 +99,7 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
+          <TabsList className="grid grid-cols-2 md:grid-cols-7 gap-2">
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               <span className="hidden md:inline">Users</span>
@@ -90,6 +123,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               <span className="hidden md:inline">Security</span>
+            </TabsTrigger>
+            <TabsTrigger value="leaderboards" className="flex items-center gap-2">
+              <Trophy className="h-4 w-4" />
+              <span className="hidden md:inline">Leaderboards</span>
             </TabsTrigger>
           </TabsList>
           
@@ -427,6 +464,25 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="leaderboards" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Leaderboards</CardTitle>
+                <CardDescription>
+                  View and manage user rankings across different categories and platforms
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LeaderboardSection 
+                  leaderboardData={mockLeaderboardData}
+                  difficultyLeaderboard={mockDifficultyLeaderboard}
+                  platformLeaderboard={mockPlatformLeaderboard}
+                  categoryLeaderboard={mockCategoryLeaderboard}
+                />
               </CardContent>
             </Card>
           </TabsContent>
