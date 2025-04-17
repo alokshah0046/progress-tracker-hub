@@ -1,6 +1,9 @@
 
 import React from "react";
 import { Card } from "@/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
+import { Trophy, Medal, Award } from "lucide-react";
 
 interface LeaderboardEntry {
   id: string;
@@ -13,6 +16,7 @@ interface LeaderboardEntry {
   activeDays?: number;
   category?: string;
   platform?: string;
+  profilePic?: string;
 }
 
 interface LeaderboardSectionProps {
@@ -28,6 +32,20 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
   categoryLeaderboard,
   leaderboardData
 }) => {
+  // Returns an appropriate icon based on rank
+  const getRankIcon = (rank: number) => {
+    switch(rank) {
+      case 1:
+        return <Trophy className="h-5 w-5 text-yellow-400" />;
+      case 2:
+        return <Medal className="h-5 w-5 text-gray-400" />;
+      case 3:
+        return <Award className="h-5 w-5 text-amber-700" />;
+      default:
+        return <span className="text-foreground/70">{rank}</span>;
+    }
+  };
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
@@ -40,6 +58,7 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
                 <tr className="border-b border-border/40">
                   <th className="py-3 px-4">Rank</th>
                   <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Profile</th>
                   <th className="py-3 px-4">Score</th>
                   <th className="py-3 px-4">Active Days</th>
                 </tr>
@@ -50,8 +69,27 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
                     key={entry.id} 
                     className="border-b border-border/20 hover:bg-foreground/5"
                   >
-                    <td className="py-2 px-4 font-medium">{entry.rank}</td>
+                    <td className="py-2 px-4">
+                      <div className="flex items-center justify-center">
+                        {getRankIcon(entry.rank)}
+                      </div>
+                    </td>
                     <td className="py-2 px-4">{entry.name}</td>
+                    <td className="py-2 px-4">
+                      {entry.profilePic ? (
+                        <div className="w-8 h-8 rounded-full overflow-hidden">
+                          <img 
+                            src={entry.profilePic} 
+                            alt={entry.name}
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+                          {entry.name.charAt(0)}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-2 px-4">{entry.score}</td>
                     <td className="py-2 px-4">{entry.activeDays}</td>
                   </tr>
@@ -82,7 +120,11 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
                     key={entry.id} 
                     className="border-b border-border/20 hover:bg-foreground/5"
                   >
-                    <td className="py-2 px-4 font-medium">{entry.rank}</td>
+                    <td className="py-2 px-4">
+                      <div className="flex items-center justify-center">
+                        {getRankIcon(entry.rank)}
+                      </div>
+                    </td>
                     <td className="py-2 px-4">{entry.name}</td>
                     <td className="py-2 px-4">{entry.score}</td>
                     <td className="py-2 px-4">{entry.platform}</td>
@@ -112,7 +154,11 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
                     key={entry.id} 
                     className="border-b border-border/20 hover:bg-foreground/5"
                   >
-                    <td className="py-2 px-4 font-medium">{entry.rank}</td>
+                    <td className="py-2 px-4">
+                      <div className="flex items-center justify-center">
+                        {getRankIcon(entry.rank)}
+                      </div>
+                    </td>
                     <td className="py-2 px-4">{entry.name}</td>
                     <td className="py-2 px-4">{entry.score}</td>
                     <td className="py-2 px-4">{entry.category}</td>
@@ -149,7 +195,11 @@ const LeaderboardSection: React.FC<LeaderboardSectionProps> = ({
                     key={entry.id} 
                     className="border-b border-border/20 hover:bg-foreground/5"
                   >
-                    <td className="py-2 px-4 font-medium">{entry.rank}</td>
+                    <td className="py-2 px-4">
+                      <div className="flex items-center justify-center">
+                        {getRankIcon(entry.rank)}
+                      </div>
+                    </td>
                     <td className="py-2 px-4">{entry.name}</td>
                     <td className="py-2 px-4">{entry.easy}</td>
                     <td className="py-2 px-4">{entry.medium}</td>
